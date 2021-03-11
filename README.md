@@ -8,5 +8,6 @@
 ### HTML
 * [웹 프로그래밍 Overview](https://github.com/MrKeeplearning/TIL/blob/27ca9391fc5708db554cca0207e98472c4ac1be3/WEB/Chapter01-WEB%20overview.md)
 * [HTML의 기본 구조](https://github.com/MrKeeplearning/TIL/blob/3522327f31df3db7497c908f88c500775d91fbd9/WEB/Chapter03-Creating%20basic%20HTML%20document.md)
+* [웹 문서에 태그를 이용하여 다양한 내용 입력하기](https://github.com/MrKeeplearning/TIL/blob/f568b05482d6e5b88c163cda2b27a25ebc62d4a8/WEB/Chapter04-Entering%20Various%20Contents%20in%20Web.md)
 ### CSS
 ### JavaScript
