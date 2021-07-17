@@ -14,3 +14,4 @@
 ### GIT
 * [GIT으로 버전 관리하기](https://github.com/MrKeeplearning/TIL/blob/main/GIT/GIT2-CLI%20%EB%B2%84%EC%A0%84%EA%B4%80%EB%A6%AC.md)
 * [GIT branch & conflict](https://github.com/MrKeeplearning/TIL/blob/main/GIT/GIT3-CLI%20branch%20%26%20conflict.md)
+* [error: failed to push some refs to '[원격저장소 주소]'는 어떻게 해결할까?](https://github.com/MrKeeplearning/TIL/blob/main/GIT/failed%20to%20push%20some%20refs%20to.md)
