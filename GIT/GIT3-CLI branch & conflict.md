@@ -540,6 +540,258 @@ $ git log --all --graph --oneline
 
 <br/>
 
+## 7. 깃은 어떻게 충돌을 파악하는가?
+
+### 2 way merge
+
+---
+
+![image](https://user-images.githubusercontent.com/27791880/125911497-ba4c65a5-b8aa-48cf-a5b9-390dc596dffd.png)
+
+2-way merge 방식은 base에서 나온 2개의 branch만을 비교해서 merge하는 방식이다. 이 경우 첫 번째 데이터인 A는 here branch와 there branch에서 동일하기 때문에 문제되지 않지만, 2번째부터 4번째 데이터는 모두 서로 다르기 때문에 merge하는데 문제가 발생한다. git의 입장에서는 기준이 없기 때문에 둘 중 어느 쪽을 선택해서 merge를 해야할지 알 수가 없다. 따라서 git은 conflict를 발생시킨다.
+
+### 3 way merge
+
+---
+
+![image](https://user-images.githubusercontent.com/27791880/125911576-bcbb9888-010c-4536-a720-f7fdced20ba6.png)
+
+3-way merge 방식은 base까지 같이 비교를 하여 merge를 한다.
+
+첫 번째 데이터는 here와 there모두 동일하기 때문에 merge하는데 문제가 없다.
+
+두 번째 데이터는 here branch에서만 변경되었다. 따라서 변경된 here branch의 내용을 merge한 결과에 적용시킨다. 마찬가지로 세 번째 데이터는 there branch에서만 변경되었기 때문에 해당 변경사항을 merge branch에 적용시킨다.
+
+마지막으로 4번째 데이터는 here와 there 두 branch 모두에서 변경이 발생했다. GIT은 어느 쪽을 기준으로 merge를 진행해야 할지 결정할 수 없으므로 사용자에게 해당 작업 처리를 요청하게 된다.
+
+<br/>
+
+## 8. 외부도구를 이용한 병합
+
+현재 구축되어 있는 branch들은 다음과 같은 형태를 가지고 있다.
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (master)
+$ git log --all --graph --oneline
+* 5623fee (there) ABTT
+| * cf8e9e9 (here) AHCH
+|/
+* e4a1ac4 (HEAD -> master) ABCD
+
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (master)
+$ cat work.txt
+A
+
+B
+
+C
+
+D
+```
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here)
+$ cat work.txt
+A
+
+H
+
+C
+
+H
+```
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (there)
+$ cat work.txt
+A
+
+B
+
+T
+
+T
+```
+
+이 상태에서 here branch로 이동한 다음에 there branch를 merge하게 되면 conflict가 발생하게 된다. 정확하게 어디에서 conflict가 발생했는지 확인하기 위해서 here branch의 work.txt 내용을 살펴보자.
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here)
+$ git merge there
+Auto-merging work.txt
+CONFLICT (content): Merge conflict in work.txt
+Automatic merge failed; fix conflicts and then commit the result.
+
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here|MERGING)
+$ cat work.txt
+A
+
+H
+
+T
+
+<<<<<<< HEAD
+H
+=======
+T
+>>>>>>> there
+```
+
+3 way merge를 사용하기 때문에 세 번째 데이터까지는 처리하는 것에 문제가 없지만 마지막 데이터는 here와 there 모두에서 변경되어 git 스스로 처리하는 것이 불가능하다.
+
+이러한 conflict를 사용자가 직접 해결하는 방법도 있지만 병합을 전문적으로 해주는 외부 tool을 사용할 수도 있다. P4Merge라는 툴을 사용했다.
+
+Download Link : [P4Merge](https://www.perforce.com/downloads/visual-merge-tool)
+
+P4Merge라는 tool을 merge하기 위해서 사용하려면 git에 전역설정을 해주어야 한다.
+
+```bash
+git config --global merge.tool p4merge
+```
+위와 같이 명령을 전달할 경우 git의 전역설정으로 merge tool로 p4merge tool을 사용하겠다는 것을 뜻한다. 이렇게 전역설정을 마친 뒤에 home directory의 `.gitconfig`파일을 보면 merge에 대한 세팅 정보를 확인할 수 있다.
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here|MERGING)
+$ git config --global merge.tool p4merge
+
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here|MERGING)
+$ cat ~/.gitconfig
+[user]
+        name = Jaeseok
+        email = jaeseok1115@gmail.com
+[core]
+        autocrlf = true
+[merge]
+        tool = p4merge
+```
+
+merge tool로 무엇을 사용할지 지정했다고 바로 사용할 수 있는 것은 아니다. p4merge를 사용한다고 했다면, 명령을 입력했을 때 해당 툴을 어디서 불러와서 사용할지에 대한 정보가 있어야 올바르게 명령을 실행할 수 있다.
+
+따라서, 역시 `.gitconfig` 파일에 경로를 지정해주어야 하는데 이 때 사용하는 명령은 다음과 같다.
+
+```bash
+$ git config --global mergetool.p4merge.path "C:\Program Files\Perforce\p4merge.exe"
+```
+
+path 뒤에는 p4merge.exe 파일이 저장된 주소를 입력하면 되는데, 만약 자신의 컴퓨터에 설치된 위치가 다르다면 해당 위치에 맞게 수정해야 한다.
+
+`.gitconfig` 파일을 살펴보면 merge tool의 경로가 지정된 것을 확인할 수 있다.
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here|MERGING)
+$ cat ~/.gitconfig
+[user]
+        name = Jaeseok
+        email = jaeseok1115@gmail.com
+[core]
+        autocrlf = true
+[merge]
+        tool = p4merge
+[mergetool "p4merge"]
+        path = C:\\Program Files\\Perforce\\p4merge.exe
+```
+
+이제 설정을 마쳤으니 merge tool을 활용하여 merge를 진행해보자.
+
+merge tool을 활용한 merge를 진행하기 위해서는 명령으로 `git mergetool`을 전달하면 된다.
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here|MERGING)
+$ git mergetool
+Merging:
+work.txt
+
+Normal merge conflict for 'work.txt':
+  {local}: modified file
+  {remote}: modified file
+
+```
+
+![image](https://user-images.githubusercontent.com/27791880/126029924-919d338f-7c5b-4d14-a6e1-084c2a58cf58.png)
+
+`git mergetool`을 실행한 뒤 나오는 창이 앞에서 설치한 p4merge이다.
+
+
+**📌 참조** 
+
+[Setup p4merge as difftool and mergetool on Windows](https://gist.github.com/dgoguerra/8258007)
+
+가운데 나오는 노란색으로 표시된 `./work_BASE_1116.txt`는 두 브랜치의 공통의 조상이다.
+
+merge 작업을 시작할 때 here branch에서 진행했다. 즉, 현재 속해 있는 LOCAL은 here인 것이고, 오른쪽에 표시된 초록색 영역이 here branch의 결과물이다. 따라서 남아 있는 파란색 영역인 REMOTE가 there branch에 해당한다.
+
+하단에 `work.txt` 섹션에 있는 것이 p4merge가 생성해준 merge 파일이다. 하지만, 이 역시 마지막 데이터는 두 영역에서 모두 수정되었기에 사용자의 조작이 필요하다.
+
+해당 영역은 사용자 임의대로 목적에 맞게 수정하면 된다.\
+
+수정을 한 뒤 저장 후 프로그램을 종료하면 자동으로 `add`까지는 작업해준다.
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here|MERGING)
+$ git status
+On branch here
+All conflicts fixed but you are still merging.
+  (use "git commit" to conclude merge)
+
+Changes to be committed:
+        modified:   work.txt
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        work.txt.orig
+```
+
+그럼 Untracked files에 있는 `work.txt.orig` 파일은 무엇일까? `orig`는 original의 약자로 merge tool을 사용하기 이전 상태를 백업해 둔 것이다.
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here|MERGING)
+$ cat work.txt.orig
+A
+
+H
+
+T
+
+<<<<<<< HEAD
+H
+=======
+T
+>>>>>>> there
+```
+
+그리고 work.txt는 사용자 임의대로 바꾼 형태가 제대로 적용되어 있다.
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here|MERGING)
+$ cat work.txt
+A
+
+H
+
+T
+
+D, T, H
+```
+
+merge 수정 사항이 확실하다면 이제 orig 파일은 필요 없기 때문에 삭제해준다.
+
+`git commit`을 해주면 vim 편집기에 다음과 같이 충돌이 있었고 어떠한 행동을 하면 되는지에 대한 설명이 나온다.
+
+![image](https://user-images.githubusercontent.com/27791880/126030372-927f0eb4-a322-43c6-8021-f4ecc506f2f8.png)
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git3/ch10 (here)
+$ git log --all --graph --oneline
+*   c3b2d7c (HEAD -> here) Merge branch 'there' into here
+|\
+| * 5623fee (there) ABTT
+* | cf8e9e9 AHCH
+|/
+* e4a1ac4 (master) ABCD
+```
+
+모두 정상적으로 merge가 완료되었다.
+
 ## 정리
 
 * `git branch [branch name]` : 브랜치 생성
