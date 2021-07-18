@@ -130,6 +130,8 @@ $ git commit -am "add b"
 
 이미 앞에서 local repository와 remote repository의 main branch를 연결했기 때문에 push는 단순히 `git push`만 입력하면 된다.
 
+<br/>
+
 ### 사이트에서 직접 커밋, 그리고 PULL
 
 ---
@@ -181,3 +183,82 @@ Date:   Sun Jul 18 03:01:52 2021 +0900
 
     Initial commit
 ```
+
+> 💡 여러 대의 컴퓨터에서 작업을 할 때는 항상 **원격 저장소에서 pull -> 내 컴퓨터에서 작업 -> staging & commit -> push** 과정을 반드시 지키자!
+
+<br/>
+
+## 4. HTTP 방식 - CLONE
+
+현재까지는 지역저장소에 있는 것을 원격저장소로 `PUSH`함으로써 백업이라는 목적을 달성했다. 백업을 할 수 있다면 복원을 할 수 있어야 의미가 있다.
+
+새로운 컴퓨터를 마련하고 해당 컴퓨터로 지금까지 작업했던 것을 복제(`CLONE`)해서 복원하는 방법을 살펴보자. 복원을 할 수 있게 되면 여러 대의 컴퓨터에서 같은 소스코드의 상태를 유지할 수 있고, 이러한 특징은 이동하면서 작업하는데 상당한 편리함을 제공해준다.
+
+현재까지 작업해왔던 `/git_study/git4/loc-git` 저장소가 아닌 바로 상위 저장소인 `/git_study/git4`에 `CLONE`을 시도해보자.
+
+`git`을 입력해보면 manual이 나오는데 저장소름 만드는 방법 2가지를 알려준다. 지금까지는 최초 저장소 생성을 위한 init을 사용했다면 이번에는 이미 있는 repository를 복제하기 위한 `clone`을 사용해본다.
+
+![image](https://user-images.githubusercontent.com/27791880/126056396-9f01bc35-4aca-4318-a5e4-b3343f14edf1.png)
+
+clone을 진행하기 위해서는 clone하려는 repository의 주소가 필요한데 이것은 push를 할 때와 동일한 방법으로 https 주소를 복사한다.
+
+![image](https://user-images.githubusercontent.com/27791880/126056483-19b63917-4439-4277-9c52-2848e6afb213.png)
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git4
+$ git clone https://github.com/MrKeeplearning/GithubPractice2.git
+```
+현재 위치에서 위와 같이 명령을 입력하면 현재 디렉토리에 GithubPractice2라는 디렉토리가 생성되면서 해당 디렉토리에 clone이 된다. 만약 다른 디렉토리에 clone을 하고 싶다면 위의 명령 뒤에 이어서 원하는 디렉토리명을 지정하면 해당 디렉토리로 저장소가 생성된다.
+
+e.g., `$ git clone https://github.com/MrKeeplearning/GithubPractice2.git exDir`
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git4
+$ git clone https://github.com/MrKeeplearning/GithubPractice2.git
+Cloning into 'GithubPractice2'...
+remote: Enumerating objects: 12, done.
+remote: Counting objects: 100% (12/12), done.
+remote: Compressing objects: 100% (8/8), done.
+remote: Total 12 (delta 1), reused 5 (delta 0), pack-reused 0
+Receiving objects: 100% (12/12), done.
+Resolving deltas: 100% (1/1), done.
+
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git4
+$ ls
+GithubPractice2/  loc-git/
+```
+
+GithubPractice2라는 repository가 생성된 것을 확인할 수 있다.
+
+repository에 담긴 내용을 살펴보면 이전에 `loc-git/` 디렉토리에 만들었던 내용과 동일하다. 즉, 원격저장소의 내용을 복제해서 지역저장소를 생성하는 작업이 정상적으로 진행되었다.
+
+### GithubPractice2/
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git4/GithubPractice2 (main)
+$ ls -al
+total 7
+drwxr-xr-x 1 JaeSeok 197121  0 Jul 18 14:15 ./
+drwxr-xr-x 1 JaeSeok 197121  0 Jul 18 14:15 ../
+drwxr-xr-x 1 JaeSeok 197121  0 Jul 18 14:15 .git/
+-rw-r--r-- 1 JaeSeok 197121 70 Jul 18 14:15 README.md
+-rw-r--r-- 1 JaeSeok 197121  6 Jul 18 14:15 f1.txt
+-rw-r--r-- 1 JaeSeok 197121  7 Jul 18 14:15 f2.txt
+```
+
+### loc-git/
+
+```bash
+JaeSeok@DESKTOP-2UKJA1I MINGW64 ~/git_study/git4/loc-git (main)
+$ ls -al
+total 11
+drwxr-xr-x 1 JaeSeok 197121  0 Jul 18 05:01 ./
+drwxr-xr-x 1 JaeSeok 197121  0 Jul 18 14:15 ../
+drwxr-xr-x 1 JaeSeok 197121  0 Jul 18 05:01 .git/
+-rw-r--r-- 1 JaeSeok 197121 70 Jul 18 03:24 README.md
+-rw-r--r-- 1 JaeSeok 197121  6 Jul 18 04:36 f1.txt
+-rw-r--r-- 1 JaeSeok 197121  7 Jul 18 05:01 f2.txt
+```
+
+<br/>
+
