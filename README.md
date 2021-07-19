@@ -16,4 +16,5 @@
 * [GIT branch & conflict](https://github.com/MrKeeplearning/TIL/blob/main/GIT/GIT3-CLI%20branch%20%26%20conflict.md)
 * [HTTPS 프로토콜을 활용하여 remote repository에 연결하기](https://github.com/MrKeeplearning/TIL/blob/main/GIT/GIT3-CLI%EB%B0%B1%EC%97%85.md)
 * [SSH 프로토콜을 활용하여 remote repository에 연결하기](https://github.com/MrKeeplearning/TIL/blob/main/GIT/GIT3-CLI%EB%B0%B1%EC%97%85%20SSH.md)
+* [GIT으로 협업하기 그리고 원격브랜치와 fetch](https://github.com/MrKeeplearning/TIL/blob/main/GIT/GIT4-CLI%ED%98%91%EC%97%85.md)
 * [error: failed to push some refs to '[원격저장소 주소]'는 어떻게 해결할까?](https://github.com/MrKeeplearning/TIL/blob/main/GIT/failed%20to%20push%20some%20refs%20to.md)
