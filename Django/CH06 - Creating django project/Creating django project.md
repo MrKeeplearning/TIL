@@ -124,3 +124,11 @@ Quit the server with CTRL-BREAK.
 ```
 
 계정 생성 후 `python manage.py runserver`를 입력 한 뒤 나오는 주소에 `/admin`을 붙여서 관리자 페이지로 이동할 수 있다. 이 때 나오는 관리자 페이지는 장고 프레임워크에서 자체 제공하는 기능이다.
+
+<br/>
+
+### .gitignore파일에 db.sqlite3 추가하기
+
+<br/>
+
+db.sqlite3를 .gitignore 파일에 추가해서 버전관리를 하지 않도록 만든다. 완성된 웹사이트를 실제로 운영하기 전까지 다양한 테스트를 진행할 것이고 그 과정에서 생성된 게시글과 댓글 등은 모두 데이터베이스인 db.sqlite3에 저장된다. 실제 서버를 운영하는 상황에서 기존 local에서 생성한 db.sqlite3를 올리게 되면 해당 db.sqlite3와 실제 구동되는 서버에 올려진 db.sqlite3와 충돌을 일으켜 오류가 발생할 수 있다.
