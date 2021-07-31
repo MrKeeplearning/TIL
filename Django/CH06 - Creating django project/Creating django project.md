@@ -49,6 +49,66 @@ D:\JaeSeok\Github\do_it_django (main -> origin)
 
 프로젝트 생성 뒤 프로젝트 생성이 성공했는지 확인을 위해 `python manage.py runserver`를 입력하여 서버를 실행해보자. 처음에는 오류 메시지가 나오겠지만 하단에 있는 주소로 들어갔을 때 **'The install worked successfully'** 라는 메시지가 나온다면 성공한 것이다.
 
+프로젝트를 생성하고 난 뒤 `startproject`를 사용할 때 같이 입력한 프로젝트명에 해당하는 폴더로 이동해보면 하위에 다음과 같은 파일들이 생성된 것을 확인할 수 있다.
+
+![image](https://user-images.githubusercontent.com/27791880/127747959-07aab554-3c64-4edb-a650-e47577510fdc.png)
+
+각각의 파일이 어떤 역할을 하는지 간단히 알아보자.
+
+### __init__.py
+
+이 파일은 비어있는 파일이다. `__init__.py` 파일이 있기 때문에 파이썬에서는 현재 디렉토리를 하나의 파이썬 패키지로 인식할 수가 있다.
+
+참고로 파이썬에서 패키지는 dot(.)을 사용하여 파이썬 모듈을 계층적(directory 구조)으로 관리할 수 있게 해준다. 만약 어떤 모듈의 이름이 `A.B`라면 패키지 A의 모듈 B라고 이해하면 된다. 이 때, 모듈은 하나의 .py 파일에 해당한다. 따라서, `do_it_django_prj` 패키지 밑에 있는 asgi.py, settings.py, urls.py, wsgi.py들은 모두 module인 것이다.
+
+> 💡 python3.3 부터는 `__init__.py` 파일이 없어도 패키지로 인식이 된다. 하지만, backward compatibility를 위해서 `__init__.py` 파일을 생성해두는 것이 안전하다.
+
+### settings.py
+
+이 파일에는 현재 만드려는 웹사이트의 모든 설정을 담고 있다. 이 파일에는 우리가 앞으로 만들 모든 앱, 정적파일의 위치, 데이터베이스 세부 설정 등을 등록한다.
+
+### urls.py
+
+이 파일은 사용자가 어떤 URL형식으로 접근했을 때 어떻게 웹 사이트를 작동시킬지를 정리한 파일이다. 즉, 사이트의 URL과 view의 연결을 지정해준다. urls.py에는 모든 URL 맵핑 코드가 포함될 수도 있지만 일반적으로는 하위의 나머지 앱에 맵핑의 일부를 할당해준다. 예를 들어보자. 아래는 `do_it_django_prj`의 `urls.py` 파일이다.
+
+```python
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('blog/', include('blog.urls')),
+    path('admin/', admin.site.urls),
+]
+```
+
+현재 프로젝트에 연결된 앱은 blog와 admin이 있는데, 각각의 앱에는 하나 이상의 기능들이 구현되어 있다. 즉, URL 맵핑 코드가 더 있어야 맞다는 것이다. 그런데, 일반적으로는 앞에서도 말했다시피 맵핑의 일부를 앱에 할당해준다. 이번에는 `blog`의 `url.py`를 살펴보자.
+
+```python
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('<int:pk>/', views.PostDetail.as_view()),
+    path('', views.PostList.as_view()),
+]
+```
+
+이처럼 '포스트 자세히 보기' 기능과 '포스트 목록' 기능에 대한 나머지 URL 맵핑 코드가 존재하는 것을 확인할 수 있다.
+
+### wsgi.py
+
+이 파일은 장고 앱이 웹서버와 연결 및 소통하는 것을 돕는다.
+
+*추후 내용 보충 예정*
+
+### asgi.py
+
+*추후 내용 추가 예정*
+
+<br/>
+
+다시 `runserver`를 한 결과를 살펴보자.
+
 ```bash
 D:\JaeSeok\Github\do_it_django (main -> origin)
 (venv) λ python manage.py runserver
