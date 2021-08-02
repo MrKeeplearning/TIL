@@ -16,7 +16,7 @@ Django의 공식문서에 따르면 프로젝트와 앱의 차이를 다음과 �
 
 Ref.
 
-* [Djnago documentation](https://docs.djangoproject.com/ko/3.2/intro/tutorial01/)
+* [Django documentation](https://docs.djangoproject.com/ko/3.2/intro/tutorial01/)
 * [Stack Overflow](https://stackoverflow.com/questions/19350785/what-s-the-difference-between-a-project-and-an-app-in-django-world)
 
 <br/>
