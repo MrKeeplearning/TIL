@@ -51,7 +51,13 @@ class Post(models.Model):
     # The author field will be made soon.
 ```
 
-Post 모델은 django.db 패키지의 models모듈에 있는 Model클래스를 상속해서 만든 클래스이다.
+Post 모델은 django.db 패키지의 models모듈에 있는 Model클래스를 상속해서 만든 클래스이다. 객체로 선언한 변수명(e.g., title, content)을 데이터베이스 필드와 매칭하여 사용자가 입력한 자료를 데이터베이스에 기록한다던지, 데이터베이스에 기록된 정보를 다시 파이썬 객체로 불러오는 등의 기능을 위하여 Model 클래스를 상속하는 것이다. 그리고 이러한 기능들은 Model 클래스에 함수로 정의되어 있다.
+
+참고로, models.py는 models를 import하고 있다. 이 경우에는 해당 폴더의 `__init__.py` 파일을 먼저 읽게 된다. 그리고 `__init__.py` 파일을 살펴보면 `__all__` 변수에서 Model을 지정하여 자동으로 import되도록 하고 있다. 그리고 Model 클래스는 `base.py` 파일에 담겨 있다.
+
+Ref.
+
+[doitdjango.com의 Q&A게시판](https://doitdjango.com/board/qna/114/) - 작가님의 친절한 답변으로 이해할 수 있었다^^
 
 장고에서는 다양한 모델의 field 옵션을 제공하고 있다. 각 field option에 대한 상세한 내용은 django의 [DOCUMENTATION](https://docs.djangoproject.com/en/3.2/ref/models/fields/)을 통해 확인할 수 있다.
 
