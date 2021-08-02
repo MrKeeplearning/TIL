@@ -1,6 +1,6 @@
 # CH07 : 장고 프로젝트에서 앱 개발하기
 
-## Project vs App
+## 1. Project vs App
 
 Django의 공식문서에 따르면 프로젝트와 앱의 차이를 다음과 같이 명시하고 있다.
 
@@ -21,7 +21,7 @@ Ref.
 
 <br/>
 
-## 앱 만들기
+## 2. 앱 만들기
 
 **Step1** : 가상환경이 실행 중인지 확인
 
@@ -29,7 +29,37 @@ Ref.
 
 <br/>
 
-## 모델 만들기
+## 3. 모델 만들기
+
+### 3.1. Post 모델 생성
+
+장고는 디자인 패턴으로 MTV패턴을 사용한다고 했다. 그리고 MTV패턴에서 Model은 데이터베이스에 저장되는 데이터의 형식을 정의한다.
+
+블로그를 제작할 것인데 블로그에 핵심은 블로그에 올라간 포스트이다. 이 포스트의 형태를 정의하는 Post 모델을 만들어보자. Post에는 제목(title), 내용(content), 작성일(created_at), 작성자(author) 정보가 필요하다.
+
+```python
+# blog/models.py
+
+from django.db import models
+
+
+class Post(models.Model):
+    title = models.CharField(max_length=30)
+    content = models.TextField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    # The author field will be made soon.
+```
+
+Post 모델은 django.db 패키지의 models모듈에 있는 Model클래스를 상속해서 만든 클래스이다.
+
+장고에서는 다양한 모델의 field 옵션을 제공하고 있다. 각 field option에 대한 상세한 내용은 django의 [DOCUMENTATION](https://docs.djangoproject.com/en/3.2/ref/models/fields/)을 통해 확인할 수 있다.
+
+일단 위에서는 제목에는 CharField를, 글에는 TextField 옵션을 사용했는데, CharField는 반드시 argument로 max_length를 지정해주어 최대길이를 제한해주어야 한다.
+
+### 3.2. DB에 Post 모델 반영
+
+앞에서 Post 모델에서 데이터베이스에 어떤 데이터를 저장할지 그 형식을 지정했다. 아직 데이터베이스에 적용이 되지 않은 상태이니 migration을 통해서 적용을 시키자.
 
 ```bash
 D:\JaeSeok\Github\do_it_django (main -> origin)
@@ -37,8 +67,12 @@ D:\JaeSeok\Github\do_it_django (main -> origin)
 No changes detected
 ```
 
+### 3.3. settings.py에 blog 앱 등록하기
+
+migration을 적용했음에도 변화를 감지하지 못했다. 그 때는 맨 처음 생성했던 프로젝트 폴더(do_it_django_prj) 아래의 settings.py 파일에 현재 작업 중인 blog 앱이 등록되어 있는지 확인해야 한다.
+
 ```python
-# Application definition
+# do_it_django_prj/settings.py
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -52,7 +86,9 @@ INSTALLED_APPS = [
 ]
 ```
 
-settings.py 파일에 `blog`와 `single_pages`를 추가하여 변경사항을 감지할 수 있도록 한다.
+위와 같이 settings.py 파일에서 INSTALLED_APPS 리스트에 `blog`와 `single_pages`앱을 추가하여 변경사항을 감지할 수 있도록 한다.
+
+### 3.4. 데이터베이스에 Post 모델 반영
 
 ```bash
 D:\JaeSeok\Github\do_it_django (main -> origin)
@@ -62,9 +98,7 @@ Migrations for 'blog':
     - Create model Post
 ```
 
-정상적으로 인식.
-
-실제 DB에 모델 적용
+앞에서 입력했던 `python manage.py makemigrations`를 입력하면 정상적으로 인식하는 것을 확인할 수 있다. 그러나 아직 실제 데이터베이스에는 적용되기 전이기 때문에 마지막으로 `python manage.py migrate`를 통해서 실제 DB에 적용시킨다.
 
 ```bash
 D:\JaeSeok\Github\do_it_django (main -> origin)
@@ -75,17 +109,23 @@ Running migrations:
   Applying blog.0001_initial... OK
 ```
 
-## 포스트 개선하기
+<br/>
+
+## 4. 포스트 개선하기
+
+### 4.1. 특정 지역을 기준으로 작성 시각 맞추기
 
 ![image](https://user-images.githubusercontent.com/27791880/126892380-31769ecd-6c8e-4d1d-a582-9ea888e90eae.png)
 
-Note: You are 9 hours ahead of server time.
+admin 페이지에서 Post를 작성하고 난 뒤에 Created at에서 작성시각을 입력하려고 보면 하단에 'Note: You are 9 hours ahead of server time.'라는 문장이 나온 것을 확인할 수 있다. 이것은 그리니치 표준 시에 맞추어져 있기 때문이다. 따라서 서울을 기준으로 시간을 바꾸어주자.
 
-어떻게 해결하지? settings.py 파일을 열어 기존 그리니치 표준시에 맞추어진 것을 서울을 기준으로 바꿔주자.
+#### Solution
 
-### 기존 설정
+do_it_django_prj\settings.py 파일을 열어 기존 그리니치 표준시에 맞추어진 것을 서울을 기준으로 바꿔주자.
 
-```bash
+#### 기존 설정
+
+```python
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -100,9 +140,11 @@ USE_L10N = True
 USE_TZ = True
 ```
 
-### 수정 이후
+기존 설정에서 TIME_ZONE과 USE_TZ 항목을 변경하면 된다.
 
-```bash
+#### 수정 이후
+
+```python
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -117,4 +159,5 @@ USE_L10N = True
 USE_TZ = False
 ```
 
-TIME_ZONE과 USE_TZ 항목을 변경함. 그런데, USE_TZ 항목은 무엇을 담당하지?
+그런데, TIME_ZONE은 무엇을 담당하는지 알곘는데, USE_TZ 항목은 무엇을 담당할까?
+
