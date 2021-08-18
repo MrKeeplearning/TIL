@@ -78,3 +78,33 @@ tidle이 붙은 2개의 파일을 삭제하고 보니 해결되었다.
 
 * `~ip`
 * `~ip-21.2.3.dist-info`
+
+## 터미널에서 제안하는 올바른 upgrade 명령
+
+터미널에서는 만약 나의 pip가 구버전이라면 upgrade를 제안하는데, 이 때 터미널에서 제안하는 방법을 따른다면 위와 같은 문제가 발생하지 않는다.
+
+```bash
+c:\users\jaeseok\appdata\local\programs\python\python39\python.exe -m pip install --upgrade pip
+```
+
+## p.574 오류
+
+`docker-compose up`을 입력하면 여러 문장들이 길게 출력되는데 가장 밑에 있는 메시지만 확인해보자.
+
+```bash
+web_1  |   File "/usr/local/lib/python3.8/site-packages/django/db/backends/postgresql/base.py", line 29, in <module>
+web_1  |     raise ImproperlyConfigured("Error loading psycopg2 module: %s" % e)
+web_1  | django.core.exceptions.ImproperlyConfigured: Error loading psycopg2 module: No module named 'psycopg2'
+```
+
+## p.575 ProgrammingError
+
+![image](https://user-images.githubusercontent.com/27791880/129439609-4a5ef7f5-96b6-4ff1-929c-d8d41142c5a5.png)
+
+## p.583
+
+장고가 정적 파일을 찾지 못해 발생한 오류
+![image](https://user-images.githubusercontent.com/27791880/129444966-e5a682f2-489c-4fe7-87fd-e461eb082960.png)
+
+시크릿창에서 오픈
+![image](https://user-images.githubusercontent.com/27791880/129445011-ee49f505-6175-4512-b38f-11faa8f72d20.png)
