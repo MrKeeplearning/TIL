@@ -108,6 +108,27 @@ if태그에는 filter와 다양한 연산자를 적용하는 것도 가능하다
 
 [length](https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#std:templatefilter-length)는 예외이지만 대부분의 템플릿 필터는 문자열을 반환하기 때문에 필터를 사용한 수학적 비교는 예상했던 것과 다르게 작동할 수 있다.
 
+### ◻ include
+
+템플릿을 로드하고 현재 context로 렌더링을 한다. `include`는 템플릿 내에 다른 템플릿을 포함하는 방법이다. 템플릿 이름은 변수이거나 하드코딩된(작은 또는 큰따옴표로 묶인) 문자열일 수 있다.
+
+아래의 예시는 "foo/bar.html" 템플릿의 내용을 포함하고 있다.
+
+```html
+{% include "foo/bar.html" %}
+```
+
+일반적으로 템플릿 이름은 템플릿 로더의 루트 디렉토리에 상대적이다. 문자열 인수는 `./` 또는 `../`로 시작하는 상대 경로일 수 있다.
+
+아래의 예시는 `template_name` 변수에 이름이 담긴 템플릿의 내용을 include한다.
+
+```html
+{% include template_name %}
+```
+
+#### Ref.
+[장고 Docs: Built-in template tags - include](https://docs.djangoproject.com/en/3.2/ref/templates/builtins/#include)
+
 <br/>
 
 ## Comments
