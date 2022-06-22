@@ -556,7 +556,7 @@ mysql> CREATE TABLE f1_2022_results (
 
 <br/>
 
-### 8.1. `f1_2022_results`테이블 생성하기
+## 8.1. `f1_2022_results`테이블 생성하기
 
 ```mysql
 mysql> SELECT * FROM f1_2022_results;
@@ -575,6 +575,172 @@ mysql> SELECT * FROM f1_2022_results;
 +----+----------------+---------------------+-----------------+----------------------+------+--------------+
 9 rows in set (0.00 sec)
 ```
+
+## 8.2. `f1_2022_results`테이블 분리작업 - `f1_2022`테이블과 `winner`테이블 생성
+
+`f1_2022` 테이블 생성
+
+```mysql
+mysql> CREATE TABLE f1_2022(
+    ->  id INT NOT NULL AUTO_INCREMENT,
+    ->  grand_prix VARCHAR(100) NOT NULL,
+    ->  date DATETIME NOT NULL,
+    ->  laps TINYINT NULL,
+    ->  time TIME(3) NULL,
+    ->  winner_id INT NULL,
+    ->  PRIMARY KEY(id)
+    -> );
+Query OK, 0 rows affected (0.49 sec)
+
+mysql> DESC f1_2022;
++------------+--------------+------+-----+---------+----------------+
+| Field      | Type         | Null | Key | Default | Extra          |
++------------+--------------+------+-----+---------+----------------+
+| id         | int          | NO   | PRI | NULL    | auto_increment |
+| grand_prix | varchar(100) | NO   |     | NULL    |                |
+| date       | datetime     | NO   |     | NULL    |                |
+| laps       | tinyint      | YES  |     | NULL    |                |
+| time       | time(3)      | YES  |     | NULL    |                |
+| winner_id  | int          | YES  |     | NULL    |                |
++------------+--------------+------+-----+---------+----------------+
+6 rows in set (0.00 sec)
+```
+
+`winner` 테이블 생성
+
+```mysql
+mysql> CREATE TABLE winner (
+    ->  id INT NOT NULL AUTO_INCREMENT,
+    ->  driver VARCHAR(100) NOT NULL,
+    ->  car VARCHAR(100) NULL,
+    ->  PRIMARY KEY(id)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> DESC winner;
++--------+--------------+------+-----+---------+----------------+
+| Field  | Type         | Null | Key | Default | Extra          |
++--------+--------------+------+-----+---------+----------------+
+| id     | int          | NO   | PRI | NULL    | auto_increment |
+| driver | varchar(100) | NO   |     | NULL    |                |
+| car    | varchar(100) | YES  |     | NULL    |                |
++--------+--------------+------+-----+---------+----------------+
+3 rows in set (0.00 sec)
+```
+
+### `winner`테이블에 값 채우기
+
+---
+
+`id`에 `AUTO_INCREMENT`를 설정해두었음에도 사용자가 임의로 숫자를 부여하는 것도 가능하다.
+
+```mysql
+mysql> INSERT INTO winner (id, driver, car)
+    -> VALUES(1, 'Charles_Leclerc', 'FERRARI');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM winner;
++----+-----------------+---------+
+| id | driver          | car     |
++----+-----------------+---------+
+|  1 | Charles_Leclerc | FERRARI |
++----+-----------------+---------+
+1 row in set (0.00 sec)
+```
+
+```mysql
+mysql> SELECT * FROM winner;
++----+-----------------+----------------------+
+| id | driver          | car                  |
++----+-----------------+----------------------+
+|  1 | Charles_Leclerc | FERRARI              |
+|  2 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  3 | Sergio_Perez    | RED_BULL_RACING_RBPT |
++----+-----------------+----------------------+
+3 rows in set (0.00 sec)
+```
+
+### `f1_2022`테이블에 값 채우기
+
+```mysql
+...
+
+mysql> INSERT INTO f1_2022 (grand_prix, date, laps, time, winner_id)
+    -> VALUES ('Canada', '2022-06-19', 70, '1:36:21.757', 2);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> SELECT * FROM f1_2022;
++----+----------------+---------------------+------+--------------+-----------+
+| id | grand_prix     | date                | laps | time         | winner_id |
++----+----------------+---------------------+------+--------------+-----------+
+|  1 | Bahrain        | 2022-03-20 00:00:00 |   57 | 01:37:33.584 |         1 |
+|  2 | Saudi_Arabia   | 2022-03-27 00:00:00 |   50 | 01:24:19.293 |         2 |
+|  3 | Australia      | 2022-04-10 00:00:00 |   58 | 01:27:46.548 |         1 |
+|  4 | Emilia_Romagna | 2022-04-24 00:00:00 |   63 | 01:32:07.986 |         2 |
+|  5 | Miami          | 2022-05-08 00:00:00 |   57 | 01:34:24.258 |         2 |
+|  6 | Spain          | 2022-05-22 00:00:00 |   66 | 01:37:20.475 |         2 |
+|  7 | Monaco         | 2022-05-29 00:00:00 |   64 | 01:56:30.265 |         3 |
+|  8 | Azerbaijan     | 2022-06-12 00:00:00 |   51 | 01:34:05.941 |         2 |
+|  9 | Canada         | 2022-06-19 00:00:00 |   70 | 01:36:21.757 |         2 |
++----+----------------+---------------------+------+--------------+-----------+
+9 rows in set (0.00 sec)
+```
+
+# 9. JOIN
+
+`f1_2022` 테이블과 `winner` 테이블의 결합 고리는 `f1_2022`의 `winner_id`와 `winner`의 `id`이다.
+
+그렇다면 `f1_2022` 테이블을 출력할 때 `winner_id`가 참조하는 `winner`테이블의 값까지 같이 결합시켜 출력하려면 어떻게 해야 할까?
+
+```mysql
+mysql> SELECT * FROM f1_2022
+    -> LEFT JOIN winner
+    -> ON f1_2022.winner_id = winner.id;
++----+----------------+---------------------+------+--------------+-----------+------+-----------------+----------------------+
+| id | grand_prix     | date                | laps | time         | winner_id | id   | driver          | car                  |
++----+----------------+---------------------+------+--------------+-----------+------+-----------------+----------------------+
+|  1 | Bahrain        | 2022-03-20 00:00:00 |   57 | 01:37:33.584 |         1 |    1 | Charles_Leclerc | FERRARI              |
+|  2 | Saudi_Arabia   | 2022-03-27 00:00:00 |   50 | 01:24:19.293 |         2 |    2 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  3 | Australia      | 2022-04-10 00:00:00 |   58 | 01:27:46.548 |         1 |    1 | Charles_Leclerc | FERRARI              |
+|  4 | Emilia_Romagna | 2022-04-24 00:00:00 |   63 | 01:32:07.986 |         2 |    2 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  5 | Miami          | 2022-05-08 00:00:00 |   57 | 01:34:24.258 |         2 |    2 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  6 | Spain          | 2022-05-22 00:00:00 |   66 | 01:37:20.475 |         2 |    2 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  7 | Monaco         | 2022-05-29 00:00:00 |   64 | 01:56:30.265 |         3 |    3 | Sergio_Perez    | RED_BULL_RACING_RBPT |
+|  8 | Azerbaijan     | 2022-06-12 00:00:00 |   51 | 01:34:05.941 |         2 |    2 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  9 | Canada         | 2022-06-19 00:00:00 |   70 | 01:36:21.757 |         2 |    2 | Max_Verstappen  | RED_BULL_RACING_RBPT |
++----+----------------+---------------------+------+--------------+-----------+------+-----------------+----------------------+
+9 rows in set (0.00 sec)
+```
+
+`ON`을 사용해서 mysql에게 어떤 기준을 가지고 결합해야 하는지 정보를 전달해준다.
+
+`winner_id`와 `id`는 서로 같은 값을 가지고 있어 하나의 결합된 테이블을 보고 싶을 때는 굳이 필요하지 않아 보인다.
+
+이 둘을 제거하고 테이블을 출력해보자.
+
+```mysql
+mysql> SELECT f1_2022.id, grand_prix, date, laps, time, driver, car FROM f1_2022
+    -> LEFT JOIN winner
+    -> ON f1_2022.winner_id = winner.id;
++----+----------------+---------------------+------+--------------+-----------------+----------------------+
+| id | grand_prix     | date                | laps | time         | driver          | car                  |
++----+----------------+---------------------+------+--------------+-----------------+----------------------+
+|  1 | Bahrain        | 2022-03-20 00:00:00 |   57 | 01:37:33.584 | Charles_Leclerc | FERRARI              |
+|  2 | Saudi_Arabia   | 2022-03-27 00:00:00 |   50 | 01:24:19.293 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  3 | Australia      | 2022-04-10 00:00:00 |   58 | 01:27:46.548 | Charles_Leclerc | FERRARI              |
+|  4 | Emilia_Romagna | 2022-04-24 00:00:00 |   63 | 01:32:07.986 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  5 | Miami          | 2022-05-08 00:00:00 |   57 | 01:34:24.258 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  6 | Spain          | 2022-05-22 00:00:00 |   66 | 01:37:20.475 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  7 | Monaco         | 2022-05-29 00:00:00 |   64 | 01:56:30.265 | Sergio_Perez    | RED_BULL_RACING_RBPT |
+|  8 | Azerbaijan     | 2022-06-12 00:00:00 |   51 | 01:34:05.941 | Max_Verstappen  | RED_BULL_RACING_RBPT |
+|  9 | Canada         | 2022-06-19 00:00:00 |   70 | 01:36:21.757 | Max_Verstappen  | RED_BULL_RACING_RBPT |
++----+----------------+---------------------+------+--------------+-----------------+----------------------+
+9 rows in set (0.00 sec)
+```
+
+반드시 첫 번째 SELECT문에서 `id` 칼럼이 어떤 테이블의 칼럼인지 명시해주어야 한다. `LEFT JOIN`을 하는 `winner` 테이블에도 `id` 칼럼이 있기 때문에 테이블명을 명시하지 않으면 `Column 'id' in field list is ambiguous`라고 알려주며 error를 발생시킨다.
+
+<br/>
 
 ### Ref.
 
