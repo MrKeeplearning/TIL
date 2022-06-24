@@ -112,6 +112,42 @@ SELECT * FROM tableA A
 INNER JOIN tableB B ON A.key = B.key
 ```
 
+* 양쪽 모두에 존재하는 레코드만을 가지고 표를 생성한다.
+
+* NULL행이 존재하지 않는다.
+
+* 표준 SQL과 달리 MySQL에서는 JOIN, INNER JOIN, CROSS JOIN 모두 같은 의미로 사용된다.
+
+### 🔹topic 테이블과 author 테이블을 INNER JOIN
+
+```mysql
+mysql> SELECT * FROM topic
+    -> INNER JOIN author ON topic.author_id = author.aid;
++-----+--------------+------------------+-----------+-----+--------+-------------+------------+
+| tid | title        | description      | author_id | aid | name   | city        | profile_id |
++-----+--------------+------------------+-----------+-----+--------+-------------+------------+
+|   1 | Saul Goodman | Better Call Saul | 1         |   1 | Saul   | Cicero      |          1 |
+|   2 | White        | Say my name      | 2         |   2 | Walter | Albuquerque |          2 |
+|   3 | Jimmy        | Call Saul        | 1         |   1 | Saul   | Cicero      |          1 |
++-----+--------------+------------------+-----------+-----+--------+-------------+------------+
+3 rows in set (0.01 sec)
+```
+
+`INNER JOIN`은 표준 SQL방식과는 별도로 MySQL에서만 사용 가능한 방식이 따로 존재한다. 문법은 조금 다를 수 있어도 결과는 동일하다.
+
+```mysql
+mysql> SELECT * FROM topic, author
+    -> WHERE topic.author_id = author.aid;
++-----+--------------+------------------+-----------+-----+--------+-------------+------------+
+| tid | title        | description      | author_id | aid | name   | city        | profile_id |
++-----+--------------+------------------+-----------+-----+--------+-------------+------------+
+|   1 | Saul Goodman | Better Call Saul | 1         |   1 | Saul   | Cicero      |          1 |
+|   2 | White        | Say my name      | 2         |   2 | Walter | Albuquerque |          2 |
+|   3 | Jimmy        | Call Saul        | 1         |   1 | Saul   | Cicero      |          1 |
++-----+--------------+------------------+-----------+-----+--------+-------------+------------+
+3 rows in set (0.00 sec)
+```
+
 ## 2. LEFT (OUTER) JOIN
 
 table A에 존재하는 정보와 table A와 B 모두에 존재하는 정보까지 포함한다.
@@ -236,8 +272,97 @@ SELECT * FROM tableA A
 FULL OUTER JOIN tableB B ON A.key = B.key
 ```
 
+* 합집합과 같은 역할을 수행(`LEFT JOIN`과 `RIGHT JOIN`을 합한 결과)한다.
+
+* 중복되는 행은 제거된다.
+
+* 많은 데이터베이스 시스템에서 `FULL OUTER JOIN`은 지원되지 않는다.
+
+  ```mysql
+  mysql> SELECT * FROM topic
+      -> FULL OUTER JOIN author ON topic.author_id = author.aid;
+  ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'OUTER JOIN author ON topic.author_id = author.aid' at line 2
+  ```
+  MySQL에서는 문법 오류가 발생하는 것을 확인할 수 있다.
+
+* `FULL OUTER JOIN`의 기능은 `UNION`을 통해서 동일한 결과를 얻을 수 있다.
+
+### 💡UNION
+
+---
+
+* 여러 개의 SELECT 문의 결과를 하나의 테이블이나 결과 집합으로 표현할 때 사용
+
+* 각각의 SELECT 문으로 선택된 필드의 개수와 타입은 모두 같아야 하며, 필드의 순서 또한 같아야 한다.
+
+* 두 개의 SELECT 문의 결과에서 중복된 레코드는 한 번만 표시된다. 즉, `UNION DISTINCT`와 같이 `DISTINCT`를 굳이 명시할 필요가 없다.
+
+* 만약 중복된 레코드까지 모두 출력하고 싶다면 `UNION ALL`을 사용하면 된다.
+
+`UNION`만 사용한 경우
+```mysql
+mysql> (SELECT * FROM topic
+    -> LEFT JOIN author ON topic.author_id = author.aid)
+    -> UNION
+    -> (SELECT * FROM topic
+    -> RIGHT JOIN author ON topic.author_id = author.aid);
++------+--------------+------------------+-----------+------+---------+-------------+------------+
+| tid  | title        | description      | author_id | aid  | name    | city        | profile_id |
++------+--------------+------------------+-----------+------+---------+-------------+------------+
+|    1 | Saul Goodman | Better Call Saul | 1         |    1 | Saul    | Cicero      |          1 |
+|    2 | White        | Say my name      | 2         |    2 | Walter  | Albuquerque |          2 |
+|    3 | Jimmy        | Call Saul        | 1         |    1 | Saul    | Cicero      |          1 |
+|    4 | Kim          | Wexler is ...    | NULL      | NULL | NULL    | NULL        |       NULL |
+| NULL | NULL         | NULL             | NULL      |    3 | Gustavo | Chile       |          3 |
++------+--------------+------------------+-----------+------+---------+-------------+------------+
+5 rows in set (0.00 sec)
+```
+
+`UNION ALL`을 사용한 경우
+```mysql
+mysql> (SELECT * FROM topic
+    -> LEFT JOIN author ON topic.author_id = author.aid)
+    -> UNION ALL
+    -> (SELECT * FROM topic
+    -> RIGHT JOIN author ON topic.author_id = author.aid);
++------+--------------+------------------+-----------+------+---------+-------------+------------+
+| tid  | title        | description      | author_id | aid  | name    | city        | profile_id |
++------+--------------+------------------+-----------+------+---------+-------------+------------+
+|    1 | Saul Goodman | Better Call Saul | 1         |    1 | Saul    | Cicero      |          1 |
+|    2 | White        | Say my name      | 2         |    2 | Walter  | Albuquerque |          2 |
+|    3 | Jimmy        | Call Saul        | 1         |    1 | Saul    | Cicero      |          1 |
+|    4 | Kim          | Wexler is ...    | NULL      | NULL | NULL    | NULL        |       NULL |
+|    3 | Jimmy        | Call Saul        | 1         |    1 | Saul    | Cicero      |          1 |
+|    1 | Saul Goodman | Better Call Saul | 1         |    1 | Saul    | Cicero      |          1 |
+|    2 | White        | Say my name      | 2         |    2 | Walter  | Albuquerque |          2 |
+| NULL | NULL         | NULL             | NULL      |    3 | Gustavo | Chile       |          3 |
++------+--------------+------------------+-----------+------+---------+-------------+------------+
+8 rows in set (0.00 sec)
+```
+
+## 5. EXCLUSIVE LEFT JOIN
+
+![exclusiveJoin_xsmall](https://user-images.githubusercontent.com/27791880/175503441-c1084f04-ff9c-43c8-89e5-aaaf0d837b7d.png)
+
+topic 테이블과 author 테이블을 `EXCLUSIVE LEFT JOIN` (`WHERE`절이 핵심)
+
+```mysql
+mysql> SELECT * FROM topic
+    -> LEFT JOIN author
+    -> ON topic.author_id = author.aid
+    -> WHERE author.aid is NULL;
++-----+-------+---------------+-----------+------+------+------+------------+
+| tid | title | description   | author_id | aid  | name | city | profile_id |
++-----+-------+---------------+-----------+------+------+------+------------+
+|   4 | Kim   | Wexler is ... | NULL      | NULL | NULL | NULL |       NULL |
++-----+-------+---------------+-----------+------+------+------+------------+
+1 row in set (0.00 sec)
+```
+
 <br/>
 
 ### Ref.
+
+* [생활코딩 SQL JOIN](https://opentutorials.org/module/4118)
 
 * [TCP SCHOOL MySQL](http://www.tcpschool.com/mysql/intro)
