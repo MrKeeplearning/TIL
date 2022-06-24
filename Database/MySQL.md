@@ -744,6 +744,8 @@ mysql> SELECT f1_2022.id, grand_prix, date, laps, time, driver, car FROM f1_2022
 
 ### Ref.
 
+[생활코딩 MySQL](https://opentutorials.org/course/3161)
+
 [Table 작성 시 PK를 무조건 사용해야 하는 이유](https://hodongman.github.io/2019/01/14/Database-PK%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%B4%EC%95%BC-%ED%95%98%EB%8A%94-%EC%9D%B4%EC%9C%A0.html)
 
 [인덱스(index),클러스터/보조인덱스](https://jie0025.tistory.com/107)
