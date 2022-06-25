@@ -210,10 +210,36 @@
 
 * `emp_no`와 `dept_no` 두 개의 컬럼을 합쳐야 식별하는 것이 가능하다.
 
-* 이처럼 <u>두 개 이상의 컬럼을 키로 지정한 것</u>을 **Composite Key** 라고 부른다.
+* 이처럼 두 개 이상의 컬럼을 키로 지정한 것을 **Composite Key** 라고 부른다.
+
+## 2.4. Relationship
+
+![엔티티간의 연결](https://user-images.githubusercontent.com/27791880/175781213-339e3271-de82-4b9b-a3de-fa302a430a89.png)
+
+* 각각의 표들은 데이터로써 연결되어 있다.
+
+* 각각의 표의 행을 식별하는 유일무이한 식별자를 Primary Key라고 한다.
+
+### ◼️ 외래키 (Foreign Key)
+
+* 위의 그림에서 `저자` 테이블의 `아이디` 값을 가리키는 `글` 테이블의 `저자 아이디`의 값을 외래에 있는 테이블과 연결할 때 사용하는 키인 **외래키(Foreign Key, FK)**라고 부른다.
+
+* `FOREIGN KEY` 제약 조건을 설정한 필드를 외래 키라고 부르며, 한 테이블을 다른 테이블과 연결해주는 역할을 한다.
+
+* 외래키가 설정된 테이블에 레코드를 입력하면, 기준이 되는 테이블의 내용을 참조해서 레코드가 입력된다.
+
+    * FOREIGN KEY 제약 조건은 하나의 테이블을 다른 테이블에 의존하게 만든다.
+
+* FK 제약 조건을 설정할 때 참조되는 테이블의 필드는 반드시 UNIQUE나 PK 제약 조건이 설정되어 있어야 한다.
+
+## 2.5. Cardinality
+
+
 
 ### Ref.
 
 * [생활코딩 - 관계형 데이터 모델링](https://opentutorials.org/module/4134)
 
 * Wikipedia
+
+* [TCP SCHOOL - MySQL](http://tcpschool.com/mysql/intro)
