@@ -234,12 +234,103 @@
 
 ## 2.5. Cardinality
 
+> Cardinality의 사전적 정의
+>
+> : the number of elements in a set or other grouping, as a property of that grouping
+> 즉, 1,2,3,4,5,...와 같은 숫자들을 말한다.
+
+ER 다이어그램에서 각 엔티티 사이의 관계는 다음과 같은 기호로 표시한다.
+
+![ERD-Notation](https://user-images.githubusercontent.com/27791880/175819725-d0402279-2950-4b2b-a206-bcf0e0faa5c4.png)
+
+### ◼️ 1:1 관계
+
+---
+
+![카디널리티2](https://user-images.githubusercontent.com/27791880/175870459-a54769d1-0344-4d30-894a-1b6087ab9962.png)
+
+각 선생님은 하나의 학급만을 담당한다. Kim 선생님이 1반을 맡았다면 다른 반은 맡을 수 없다.
+
+따라서, 담임에게 반은 1개이다.
+
+각 반의 담임은 한 명이다. 1반의 담임이 Kim 선생님이라면 Lee나 Park 선생님은 담임이 될 수 없다.
+
+### ◼️ 1:N 관계 (일대다 관계)
+
+---
+
+![1대N관계_1](https://user-images.githubusercontent.com/27791880/175819443-bf28c026-4446-417d-af3f-fd377556b136.png)
+
+저자는 여러 개의 댓글을 작성하는 것이 가능하다. 따라서, 저자에게 댓글은 N개이다.
+
+각 댓글은 하나의 저자만 존재한다. 이 경우 댓글에게 저자는 1개이다.
+
+이러한 경우를 **일대다 관계**라고 일컫는다.
+
+### ◼️ N:M 관계 (다대다 관계)
+
+---
+
+만들려는 서비스에서 하나의 글을 여러 명이 편집할 수 있다고 가정해보자.
+
+![다대다관계](https://user-images.githubusercontent.com/27791880/175873428-2db0304a-00bd-456b-80ed-df56ce389e43.png)
+
+저자는 여러 개의 글을 작성할 수 있다. 따라서 저자에게 글은 여러 개라는 뜻에서 M개 라고 표현할 수 있다.
+
+글에게 저자는 여러 명이 존재할 수 있다. 따라서 글에게 저자는 여러 개이기에 N개 라고 표현할 수 있다.
+
+이러한 관계를 **N:M 관계** 또는 **다대다 관계**라고 표현한다.
+
+> 💡 현실의 데이터베이스에서는 다대다관계를 표현할 수 없다.
+>
+> 데이터베이스 상에서 다대다관계를 표현할 때는 다대다 상태로 두지 않고, 중간에 **연결테이블**이라고 하는 특별한 테이블을 만들어서 최종적으로는 일대다 관계로 변환한다.
+
+## 2.6. Optionality
+
+![Optionality1](https://user-images.githubusercontent.com/27791880/175876835-92cad9af-935b-4be8-8ae7-0149b0b33626.png)
+
+### ◼️ Optional
+
+---
+
+어떤 시스템에 저자로 등록을 하면, 반드시 댓글을 작성해야할 의무는 없다.
+
+따라서 **"저자에게 댓글은 옵션이다(Optional)"** 라고 해석할 수 있다.
+
+ER 다이어그램 상에서는 다음과 같이 기호로 표시한다.
+
+![ERD-Optional1](https://user-images.githubusercontent.com/27791880/175875994-7efa508f-c773-4355-8f95-ee01c8d2fb56.png)
+
+### ◼️ Mandatory
+
+---
+
+모든 댓글에는 저자가 무조건 존재한다. 따라서 댓글에게 저자는 **필수(Mandatory)** 이다.
+
+Mandatory는 ER 다이어그램 상에서 다음과 같이 표현할 수 있다.
+
+![mandatory1](https://user-images.githubusercontent.com/27791880/175886047-db1c8537-decf-4ce8-9082-ac8fa4748319.png)
+
+저자와 댓글 사이에는 Optional과 Mandatory 관계 뿐만 아니라 동시에 일대일, 일대다, 다대다 등의 카디널리티도 존재한다.
+
+Optionality와 Cardinality 특성을 모두 반영하면 다음과 같다.
+
+* 저자에게 댓글은 여러 개이다. 그리고 댓글에게 저자는 1명뿐이다. ➡️ **1:N 관계**
+
+* 저자는 댓글을 작성할 수도 작성하지 않을 수도 있다. ➡️ **Optional**
+
+* 하나의 댓글에는 무조건 1명의 저자가 존재한다. ➡️ **Mandatory**
+
+![Optionality2](https://user-images.githubusercontent.com/27791880/175887360-dfd102c1-da24-40ec-ae47-7dda3d5840b1.png)
+
 
 
 ### Ref.
 
-* [생활코딩 - 관계형 데이터 모델링](https://opentutorials.org/module/4134)
+* [생활코딩 : 관계형 데이터 모델링](https://opentutorials.org/module/4134)
 
 * Wikipedia
 
-* [TCP SCHOOL - MySQL](http://tcpschool.com/mysql/intro)
+* [TCP SCHOOL : MySQL](http://tcpschool.com/mysql/intro)
+
+* [Lucidchart : Entity-Relationship Diagram Symbols and Notation](https://www.lucidchart.com/pages/ER-diagram-symbols-and-meaning)
