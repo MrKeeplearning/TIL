@@ -46,6 +46,8 @@
 
 * row는 record나 tuple로도 불린다.
 
+<br/>
+
 # 1. 데이터 모델링의 순서
 
 > 데이터 모델링의 순서는 다음과 같다.
@@ -323,6 +325,8 @@ Optionality와 Cardinality 특성을 모두 반영하면 다음과 같다.
 
 ![Optionality2](https://user-images.githubusercontent.com/27791880/175887360-dfd102c1-da24-40ec-ae47-7dda3d5840b1.png)
 
+<br/>
+
 # 3. 논리적 데이터 모델링
 
 * 개념적 데이터 모델링이 잘 되어 있다면 논리적 데이터 모델링은 상당히 기계적인 작업이다.
@@ -455,6 +459,8 @@ PK와 FK를 연결하는 것을 통해 관계형 데이터베이스 모델에 �
 
 ![Open tutorials ERD (3)](https://user-images.githubusercontent.com/27791880/176125601-4de49336-a322-4328-a906-084b53ace4ef.png)
 
+<br/>
+
 # 4. 논리적 데이터 모델링 - 정규화(Normalization)
 
 ### ◼️ 정규화
@@ -555,6 +561,8 @@ SELECT * FROM topic ORDER BY tag
 
 ## 4.2. 제 2 정규화
 
+### 제 2 정규화의 원칙 ➡️ No partial dependencies
+
 제 2 정규형(2NF)을 만족하기 위해서는 '부분 종속성이 없어야 한다'는 조건을 지켜야 한다.
 
 ![2NF-1](https://user-images.githubusercontent.com/27791880/176445072-6dc606cb-82c2-45eb-9d8b-ca8e5f582c94.png)
@@ -596,6 +604,168 @@ topic이라는 테이블은 부분적으로 종속되는 정보들만 가지고 
 ---
 
 ![2NF-4](https://user-images.githubusercontent.com/27791880/176463601-8fb33109-21b5-44f2-bf4c-79ea8774c815.png)
+
+## 4.3. 제 3 정규화
+
+<br/>
+
+### 제 3 정규화의 원칙 ➡️ No transitive dependencies(이행적 종속성)
+
+<br/>
+
+![2NF-topic](https://user-images.githubusercontent.com/27791880/176478786-47cbcf52-c840-4b3f-b16a-8d7698111cf2.png)
+
+* 위의 제 2 정규화를 마친 상태의 topic 테이블에서 `title=MySQL`인 행은 title 이라는 기본 키에 종속되어 있다.
+
+* `author_id`는 `title`에 의존하고, `author_name`과 `author_profile`은 `author_id`에 의존하는 관계를 **이행적 종속성**이라고 한다.
+
+* 이행적 종속성을 가지고 있다면 테이블에 문제가 있다는 증거이다.
+
+![2NF-topic colored](https://user-images.githubusercontent.com/27791880/176480411-ee2a603f-3ec9-48d3-aa29-9170ae994008.png)
+
+중복이 되는 행은 분리한다.
+
+![3NF-1](https://user-images.githubusercontent.com/27791880/176481814-2c084bf5-f027-4f9b-b80b-88b9cdfc2a2d.png)
+
+<br/>
+
+# 5. 물리적 데이터 모델링
+
+* 물리적 데이터 모델링 : **이상적인 표를 구체적인 제품에 맞는 현실적인 표로 만드는 작업**
+
+    (*cf.* 논리적 데이터 모델링 : 관계형 데이터베이스에 맞는 이상적인 표를 만드는 작업)
+
+* 물리적 데이터 모델링의 초점 : **성능**
+
+* 데이터가 쌓이고 처리량이 많아지면 여러 쿼리가 동작할 때 특히 느려는 쿼리(Slow Query)가 발생
+
+* Slow Query가 발생한 병목지점을 찾았다면 성능 개선을 위한 작업을 진행
+
+    * Index
+
+    * Cache
+
+    * Denormalization(역정규화 or 반정규화) ➡️ 다른 개선 방법을 사용해봐도 해결이 안될 때 가장 마지막으로 사용하는 것을 권장
+
+## 📌 Index
+
+* 비약적으로 행에 대한 **읽기 성능을 향상**시키지만 **쓰기 성능을 희생**시킴
+
+    ### 쓰기 성능의 희생
+
+    * 쓰기가 이루어질 때마다 행에 인덱스가 걸려있다면 입력된 정보를 정리하기 위한 복잡한 연산과정이 필요
+
+    * 이 과정에서 많은 시간을 소요할 뿐만 아니라 저장공간을 더 많이 차지하기도 함
+
+    ### 읽기 성능의 향상
+
+    * 잘 정리된 상태는 엄청나게 빠른 상태로 읽을 수 있기 때문에 쓰기 성능에 대한 희생이 무의미하진 않다.
+
+## 📌 Cache
+
+* 인덱스만으로 성능을 향상이 힘들다면 데이터베이스를 이용하고 있는 어플리케이션 영역에서 캐시(Cache)를 활용하는 방법도 있다.
+
+* 입력에 따른 실행결과를 저장해두었다가 나중에 동일한 입력이 들어왔을 때 저장해둔 결과를 사용하는 것을 통해서 데이터베이스에 부하를 주지 않는 것이다.
+
+* 데이터베이스가 겪게 되는 부하를 획기적으로 줄일 수 있다.
+
+## 📌 Denormalization(역정규화)
+
+* Index나 Cache와 같이 여러 가지 방법을 적용해도 성능향상에 어려움이 있다면 표의 구조를 바꾸는 역정규화를 시도한다.
+
+* 정규화된 데이터베이스에서 성능이나 개발의 편의성을 개선하기 위해 사용하는 전략
+
+* 일부 쓰기 성능의 손실을 감수하고 데이터를 묶거나 데이터의 복제 사본을 추가함으로써 데이터베이스의 읽기 성능을 개선하려고 시도하는 과정
+
+    * 정규화는 표를 분할하는 작업이고, 이 표들을 JOIN해서 활용해야 하는데, JOIN은 굉장히 비싼 작업에 속한다. 결과적으로 읽기의 성능을 희생하게 된다.
+
+* 많은 수의 읽기 작업을 처리할 필요가 있는 관계형 데이터베이스 소프트웨어의 성능이나 스케일링에서 고려됨
+
+* 효율적인 역정규화를 위해서는 정규화가 선행되어야 함
+
+* 정규화되지 않은 것이 좋은 것이라고 할 수 없고, 정규화가 반드시 성능을 하락시키는 것도 아니다.
+
+## 5.1. 역정규화 - Column을 조작해서 JOIN을 줄이기
+
+사용할 전체 테이블
+
+![역정규화-1](https://user-images.githubusercontent.com/27791880/176687151-57eece3b-5765-4e1a-b6e1-c8d8b4a10c35.png)
+
+💡 진행할 작업
+
+* `topic_tag_relation` 테이블에서 `topic_title = MySQL`인 행의 태그를 확인하고 싶다.
+
+* `topic_tag_relation` 테이블에는 태그의 id값만 있고 실제 이름은 id값과 연결된 `tag`라는 테이블에 있다.
+
+* 따라서 JOIN을 활용해야 원하는 값을 확인가능
+
+```mysql
+mysql> SELECT tag.name
+    -> FROM topic_tag_relation AS ttr
+    -> LEFT JOIN tag
+    -> ON ttr.tag_id = tag.id
+    -> WHERE topic_title = 'MySQL';
++------+
+| name |
++------+
+| rdb  |
+| free |
++------+
+2 rows in set (0.00 sec)
+```
+
+서비스를 운영하다 보면 위와 같은 조회가 굉장히 많이 발생한다. 이것으로 인해서 시스템의 부하가 심해지고, 사용자의 경험이 안좋아질 수 있다.
+
+💡 해결책
+
+* 중복을 허용한다.
+
+* topic_tag_relation 테이블에서 tag_id에 해당하는 name컬럼을 추가한다.
+
+`topic_tag_relation`테이블에 역정규화를 적용한다.
+
+```mysql
+ALTER TABLE `topic_tag_relation` ADD COLUMN `tag_name` VARCHAR(45) NULL AFTER `tag_id`;
+
+UPDATE `topic_tag_relation` SET `tag_name` = 'rdb' WHERE (`topic_title` = 'MySQL') and (`tag_id` = '1');
+UPDATE `topic_tag_relation` SET `tag_name` = 'free' WHERE (`topic_title` = 'MySQL') and (`tag_id` = '2');
+UPDATE `topic_tag_relation` SET `tag_name` = 'rdb' WHERE (`topic_title` = 'ORACLE') and (`tag_id` = '1');
+UPDATE `topic_tag_relation` SET `tag_name` = 'commercial' WHERE (`topic_title` = 'ORACLE') and (`tag_id` = '3');
+```
+```mysql
+mysql> SELECT * FROM topic_tag_relation;
++-------------+--------+------------+
+| topic_title | tag_id | tag_name   |
++-------------+--------+------------+
+| MySQL       |      1 | rdb        |
+| MySQL       |      2 | free       |
+| ORACLE      |      1 | rdb        |
+| ORACLE      |      3 | commercial |
++-------------+--------+------------+
+4 rows in set (0.00 sec)
+```
+```mysql
+
+```
+
+
+### 역정규화를 했을 때의 특징
+
+---
+
+* 역정규화를 하게 되면 시스템의 복잡도가 매우 높아진다.
+
+    * *e.g.,*
+    
+        * `rdb` 값이 중복되는 행이 2개가 있어 수정하려면 각각의 행을 수정해야 하는 문제
+
+        * `tag_name` 컬럼을 `topic_tag_relation`에 역정규화를 했음에도 여전히 tag 테이블은 그대로 존재하여 중복이 발생
+
+* 시스템의 복잡도가 높아지면, 프로그램에 에러가 발생하기 훨씬 쉽다.
+
+* 그럼에도 역정규화를 하는 것은 **성능** 때문!
+
+
 
 
 <br/>
