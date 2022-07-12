@@ -744,12 +744,19 @@ mysql> SELECT * FROM topic_tag_relation;
 +-------------+--------+------------+
 4 rows in set (0.00 sec)
 ```
+정규화된 테이블에서 얻은 결과와 동일한 결과를 추출해보자.
 ```mysql
-
+mysql> SELECT tag_name FROM topic_tag_relation WHERE topic_title='MySQL';
++----------+
+| tag_name |
++----------+
+| rdb      |
+| free     |
++----------+
+2 rows in set (0.00 sec)
 ```
 
-
-### 역정규화를 했을 때의 특징
+### ◼️ 역정규화를 했을 때의 특징
 
 ---
 
@@ -763,10 +770,278 @@ mysql> SELECT * FROM topic_tag_relation;
 
 * 시스템의 복잡도가 높아지면, 프로그램에 에러가 발생하기 훨씬 쉽다.
 
-* 그럼에도 역정규화를 하는 것은 **성능** 때문!
+* 그럼에도 역정규화를 하는 것은 **빠른 읽기 성능** 때문!
 
+## 5.2. 역정규화 - 컬럼을 조작해서 계산을 줄이기
 
+5.1.에서는 JOIN을 줄이는 것에 초점을 맞췄다면 이번에는 데이터를 처리하는 비용을 줄이기 위한 역정규화에 해당한다.
 
+📌 사용할 전체 테이블
+
+![역정규화-1](https://user-images.githubusercontent.com/27791880/176687151-57eece3b-5765-4e1a-b6e1-c8d8b4a10c35.png)
+
+📌 목표 : 각각의 저자 별로 몇 개의 토픽을 생성했는지 알아내는 것
+
+📌 방법 : `topic` 테이블에서 `author_id`의 값이 같은 행이 몇 개 있는지를 카운팅
+
+<br/>
+
+### ◼️ `topic` 테이블에서 `author_id` 별로 몇 개의 행들을 가지고 있는지 출력
+
+---
+
+```mysql
+mysql> select author_id, count(author_id) from topic
+    -> group by author_id;
++-----------+------------------+
+| author_id | count(author_id) |
++-----------+------------------+
+|         1 |                2 |
+|         2 |                1 |
++-----------+------------------+
+2 rows in set (0.00 sec)
+```
+
+* 집계함수 `GROUP BY`를 활용하면 `GROUP BY` 뒤에 언급한 컬럼에 해당하는 값 별로 grouping을 해준다.
+
+만약 위와 같이 counting하는 작업을 1억 건 수행해야 한다면 `GROUP BY`는 상당히 비싼 작업이 될 수 있다.
+
+<br/>
+
+### ◼️ `author` 테이블에 `topic_count` 컬럼을 추가하여 역정규화
+
+---
+
+author 테이블에 각 author가 작성한 글의 수에 대한 컬럼을 추가하고 topic 테이블에 행이 추가될 때마다 동시에 author 테이블에 새로 추가된 칼럼 값을 증가시킨다면 역정규화의 이점을 얻을 수 있을 것이다.
+
+`topic_count` 컬럼 추가하기
+
+```mysql
+mysql> ALTER TABLE author ADD COLUMN topic_count INT NULL AFTER profile;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from author;
++----+------+-----------+-------------+
+| id | name | profile   | topic_count |
++----+------+-----------+-------------+
+|  1 | kim  | developer |        NULL |
+|  2 | lee  | DBA       |        NULL |
++----+------+-----------+-------------+
+2 rows in set (0.00 sec)
+```
+
+```mysql
+mysql> update author set topic_count = 2 where(id = 1);
+mysql> update author set topic_count = 1 where(id = 2);
+
+mysql> select * from author;
++----+------+-----------+-------------+
+| id | name | profile   | topic_count |
++----+------+-----------+-------------+
+|  1 | kim  | developer |           2 |
+|  2 | lee  | DBA       |           1 |
++----+------+-----------+-------------+
+2 rows in set (0.00 sec)
+```
+
+※ 위의 author 테이블은 topic 테이블에 행이 추가될 때마다 topic_count가 자동으로 증가하도록 설정하진 않았다. 정규화의 개념을 학습하는 차원에서 우선은 자동화가 되어 있다고 가정한다.
+
+```mysql
+mysql> select id, topic_count from author;
++----+-------------+
+| id | topic_count |
++----+-------------+
+|  1 |           2 |
+|  2 |           1 |
++----+-------------+
+2 rows in set (0.00 sec)
+```
+
+* `group by`를 사용할 때와 같은 결과를 얻지만 계산된 결과인 `topic_count`를 출력하기 때문에 빠르게 처리할 수 있다.
+
+* 다만, 이렇게 할 경우 topic_count 값을 항상 topic 테이블의 변화에 맞춰 상시 새로운 값으로 유지되어야 한다는 어려움이 존재한다.
+
+* 이처럼 역정규화를 했을 때 득과 실이 함께 존재하기 때문에 실제 사용되는 상황을 고려하여 어느 쪽이 유리한지 판단 후 적용해야 한다.
+
+## 5.3. 역정규화 - 표를 쪼개기
+
+성능을 향상시키기 위해서 하나의 표를 여러 개의 표로 쪼개는 작업
+
+📌 사용할 전체 테이블
+
+![역정규화-1](https://user-images.githubusercontent.com/27791880/176687151-57eece3b-5765-4e1a-b6e1-c8d8b4a10c35.png)
+
+`topic`테이블을 쪼갠다고 했을 때 Column을 기준으로 쪼갤 수도, Row를 기준으로 쪼갤 수도 있다.
+
+<br/>
+
+### ◼️ 컬럼을 기준으로 쪼개기
+
+---
+
+> 📌 **가정**
+>
+> * topic 테이블의 description 컬럼의 용량이 매우 큼.
+> 
+> * topic 테이블에서 description을 제외한 나머지를 조회하는 operation과 description을 포함해서 조회하는 operation이 둘 다 빈번함.
+
+<br/>
+
+![역정규화(표 쪼개기)-컬럼 기준](https://user-images.githubusercontent.com/27791880/178506329-db13c4d9-7b20-4518-9307-110863b1f136.png)
+
+위와 같이 분리를 하게 되면 용량이 큰 description 컬럼은 topic 테이블에 없기 때문에 여러 장점을 가져 성능 향상이 가능해진다.
+
+위와 같이 분리한 상태에서 topic 테이블과 topic_description 모두 사용량이 엄청나게 많다면 각각의 표들을 다른 컴퓨터에 저장하는 것이 가능해진다.
+
+서로 다른 컴퓨터에서 읽기, 쓰기와 같은 작업을 하면 컴퓨터 한 대로 처리하던 일이 여러 대로 분산되어 성능 향상이 이루어진다.
+
+이러한 작업을 **샤딩(Sharding)** 이라고 부르기도 한다. 샤딩은 최후의 수단으로 사용하는 방법이어야 한다.
+
+<br/>
+
+### ◼️ 행을 기준으로 쪼개기
+
+---
+
+결국 하나의 테이블에 들어가게 되는 컬럼의 수는 행보다 상대적으로 유한하다고 할 수 있다. 따라서 컬럼을 기준으로 테이블을 분리하는 작업에는 한계가 분명하다.
+
+하지만, 행을 기준으로 테이블을 분리하는 작업은 이론적으로는 한계가 없지만 관리가 힘들어진다.
+
+> 📌 **가정**
+>
+> 어떤 서비스가 1억명이 넘는 사용자를 보유하고 있다고 가정해보자. 그리고 해당 서비스에서는 그 많은 사용자를 조회하는 작업이 빈번하다고 가정한다.
+
+이처럼 많은 사용자를 보유한 서비스에서는 `author_id` 1번부터 1000번까지 해당하는 행을 `topic_1000`이라는 테이블을 사용하고, 1001번부터 2000번까지는 `topic_2000`이라는 테이블을 사용하는 것을 생각해 볼 수 있다.
+
+이처럼 분리를 하게 되면 `author_id`에 따라서 데이터를 저장하게 되는 표를 구분할 수 있다( `author_id`가 5라면 `topic_1000`으로 쿼리를 보낸다 ).
+
+각각의 물리적인 서버마다 서로 다른 테이블을 저장하고 서로 다른 조회를 처리하게 되어 무한히 많은 처리량을 소화할 수 있게 된다.
+
+마찬가지로 이 작업도 최후의 수단으로 사용하는 방법이어야 한다. 절대 처음부터 필요한 방법이 아니다.
+
+<br/>
+
+### ◼️ 테이블 역정규화 정리
+
+---
+
+* 테이블 역정규화는 대체로 여러 대의 서버로 분산할 때 사용하는 방법이다.
+
+## 5.4. 역정규화 - 관계의 역정규화
+
+* JOIN을 줄여서 지름길을 만드는 테크닉
+
+* 컬럼의 역정규화도 비슷한 내용이지만 Foreign Key를 추가하는 것을 통해서 JOIN을 줄이는 테크닉이다.
+
+📌 목표 : 특정 저자의 태그 아이디와 태그명 조회
+
+📌 사용할 테이블
+
+![역정규화-1](https://user-images.githubusercontent.com/27791880/176687151-57eece3b-5765-4e1a-b6e1-c8d8b4a10c35.png)
+
+📌 문제
+
+`topic_tag_relation`과 `tag`테이블을 사용한다. 그런데, 두 개의 테이블에는 저자를 확인할 수 있는 `author_id`가 없는 상태이므로 `topic` 테이블까지 JOIN해야 한다. 3개의 테이블에 대해서 진행하는 JOIN을 줄여보자.
+
+```mysql
+mysql> select
+    -> *
+    -> from
+    ->  topic_tag_relation as ttr
+    -> left join tag on ttr.tag_id = tag.id
+    -> left join topic on ttr.topic_title = topic.title;
++-------------+--------+------+------------+--------+---------------+---------------------+-----------+
+| topic_title | tag_id | id   | name       | title  | description   | created             | author_id |
++-------------+--------+------+------------+--------+---------------+---------------------+-----------+
+| MySQL       |      1 |    1 | rdb        | MySQL  | MySQL is ...  | 2011-01-01 00:00:00 |         1 |
+| MySQL       |      2 |    2 | free       | MySQL  | MySQL is ...  | 2011-01-01 00:00:00 |         1 |
+| ORACLE      |      1 |    1 | rdb        | ORACLE | ORACLE is ... | 2012-02-03 00:00:00 |         1 |
+| ORACLE      |      3 |    3 | commercial | ORACLE | ORACLE is ... | 2012-02-03 00:00:00 |         1 |
++-------------+--------+------+------------+--------+---------------+---------------------+-----------+
+4 rows in set (0.00 sec)
+```
+
+위와 같이 3개의 테이블을 JOIN한 상태에서는 where문을 통해서 id가 1인 사용자에 대한 정보를 가져온 다음에 tag의 id와 tag의 name만 출력하는 것이 가능해진다.
+
+```mysql
+mysql> select
+    ->  tag.id, tag.name
+    -> from
+    ->  topic_tag_relation as ttr
+    -> left join tag on ttr.tag_id = tag.id
+    -> left join topic on ttr.topic_title = topic.title
+    -> where author_id = 1;
++------+------------+
+| id   | name       |
++------+------------+
+|    1 | rdb        |
+|    2 | free       |
+|    1 | rdb        |
+|    3 | commercial |
++------+------------+
+4 rows in set (0.00 sec)
+```
+
+하지만, 위와 같은 작업이 빈번하게 일어난다면 JOIN이 너무 많아서 시스템의 성능 저하가 발생할 위험이 있다.
+
+> 💡 `topic_tag_relation` 테이블에 `author_id` 컬럼을 추가해서 해당 테이블에 있는 `author_id` 값만 가지고 조회를 할 수 있도록 한다면 JOIN을 줄일 수 있을 것이다.
+
+```mysql
+mysql> ALTER TABLE topic_tag_relation
+    -> ADD COLUMN author_id INT NULL
+    -> AFTER tag_id;
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from topic_tag_relation;
++-------------+--------+-----------+
+| topic_title | tag_id | author_id |
++-------------+--------+-----------+
+| MySQL       |      1 |      NULL |
+| MySQL       |      2 |      NULL |
+| ORACLE      |      1 |      NULL |
+| ORACLE      |      3 |      NULL |
++-------------+--------+-----------+
+4 rows in set (0.00 sec)
+```
+
+```mysql
+mysql> UPDATE `topic_tag_relation` SET `author_id` = '1' WHERE (`topic_title` = 'MySQL') and (`tag_id` = '1');
+mysql> UPDATE `topic_tag_relation` SET `author_id` = '1' WHERE (`topic_title` = 'MySQL') and (`tag_id` = '2');
+mysql> UPDATE `topic_tag_relation` SET `author_id` = '1' WHERE (`topic_title` = 'ORACLE') and (`tag_id` = '1');
+mysql> UPDATE `topic_tag_relation` SET `author_id` = '1' WHERE (`topic_title` = 'ORACLE') and (`tag_id` = '3');
+
+mysql> select * from topic_tag_relation;
++-------------+--------+-----------+
+| topic_title | tag_id | author_id |
++-------------+--------+-----------+
+| MySQL       |      1 |         1 |
+| MySQL       |      2 |         1 |
+| ORACLE      |      1 |         1 |
+| ORACLE      |      3 |         1 |
++-------------+--------+-----------+
+```
+
+위와 같이 역정규화를 하면 역정규화 전과 달리 tag테이블의 name을 확인하기 위해 JOIN을 한 번만 수행할 수 있게 된다.
+
+```mysql
+mysql> select
+    ->  tag.id, tag.name
+    -> from
+    ->  topic_tag_relation as ttr
+    -> left join tag on ttr.tag_id = tag.id
+    -> where ttr.author_id = 1;
++------+------------+
+| id   | name       |
++------+------------+
+|    1 | rdb        |
+|    2 | free       |
+|    1 | rdb        |
+|    3 | commercial |
++------+------------+
+4 rows in set (0.00 sec)
+```
 
 <br/>
 <br/>
