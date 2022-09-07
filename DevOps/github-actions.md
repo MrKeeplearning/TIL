@@ -11,33 +11,31 @@
 ## 1) `on` 속성
 
 - 코드 저장소의 main 브랜치에 push 이벤트가 발생할 때마다 workflow를 실행
-    
+
     ```yaml
     on:
-    	push:
-    		branches:
-    			- main
-    
-    jobs: 
+        push:
+            branches:
+                - main
+    jobs:
     ```
     
 - 매일 자정 workflow를 실행
     
     ```yaml
     on:
-    	schedule:
-    	- cron: "0 0 * * *"
-    
-    jobs: 
+        schedule:
+           - cron: "0 0 * * *"
+    jobs:
     ```
-    
+        
 - 수동으로 해당 workflow를 실행
     
     ```yaml
-    on: 
-    	workflow_dispatch:
+    on:
+        workflow_dispatch:
     
-    jobs: 
+    jobs:
     ```
     
 
@@ -52,12 +50,12 @@
     
     ```yaml
     jobs:
-    	job1:
-    		# job1에 대한 세부 내용
-    	job2:
-    		# job2에 대한 세부 내용
-    	job3:
-    		# job3에 대한 세부 내용	
+        job1:
+            # job1에 대한 세부 내용
+        job2:
+            # job2에 대한 세부 내용
+        job3:
+            # job3에 대한 세부 내용
     ```
     
 - `runs-on` 속성은 필수적으로 들어가야 한다.
@@ -67,9 +65,9 @@
         # 우분투의 최신 환경에서 실행하고 싶다면?
         
         jobs:
-        	job1:
-        		runs-on: ubuntu-latest
-        		steps: 
+            job1:
+                runs-on: ubuntu-latest
+                steps: 
         ```
         
 
@@ -85,12 +83,12 @@
     
     ```yaml
     jobs:
-    	test:
-    		runs-on: ubuntu-latest
-    		steps:
-    			- uses: actions/checkout@v3
-    			- run: npm install
-    			- run: npm test
+        test:
+            runs-on: ubuntu-latest
+            steps:
+                - uses: actions/checkout@v3
+                - run: npm install
+                - run: npm test
     ```
     
     🚨 **주의**: YAML 문법에서 시퀀스(sequence) 타입을 사용하기 때문에 각 단계 앞에는 반드시 `-` 를 붙여야 한다.
@@ -118,12 +116,12 @@
     
     ```yaml
     jobs:
-    	test:
-    		runs-on: ubuntu-latest
-    		steps:
-    			- uses: actions/checkout@v3
-    			- run: npm install
-    			- run: npm test
+        test:
+            runs-on: ubuntu-latest
+            steps:
+                - uses: actions/checkout@v3
+                - run: npm install
+                - run: npm test
     ```
     
     - workflow YAML 파일에서는 `steps` 키 하위의 `uses` 키에 사용하고자 하는 액션의 위치를 `{소유자}/{저장소명}@{참조자}` 형태로 명시한다.
