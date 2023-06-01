@@ -42,7 +42,7 @@ System.out.println(result);  // "meta, amazon 절 뽑아주세요" 출력
 
 ### 💡 현대의 자바 컴파일러가 `+` 연산을 대하는 방식
 
-- 현재의 자바 컴파일러는 `+` 연산을 StringBuilder의 append로 바꾼다.
+- 현대의 자바 컴파일러는 `+` 연산을 StringBuilder의 append로 바꾼다.
 - `str = str1 + str2 + str3`와 같은 코드가 있다면 컴파일러는 아래와 같은 코드로 만든다.
 - [스택오버플로우의 답변](https://stackoverflow.com/questions/7817951/string-concatenation-in-java-when-to-use-stringbuilder-and-concat)에서 많은 것을 얻을 수 있었다.
 
