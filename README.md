@@ -8,6 +8,7 @@
 ## Java
 
 * [N번 반복된 문자로 이루어진 문자열을 생성하는 방법](https://github.com/MrKeeplearning/TIL/blob/main/Java/%EC%9E%90%EB%B0%94%EC%9D%98%20%EB%AC%B8%EC%9E%90%EC%97%B4%20%EB%B0%98%EB%B3%B5/%EC%9E%90%EB%B0%94%EC%9D%98%20%EB%AC%B8%EC%9E%90%EC%97%B4%20%EB%B0%98%EB%B3%B5.md)
+* [StringBuffer와 String, 그리고 StringBuilder](https://github.com/MrKeeplearning/TIL/blob/main/Java/StringBuffer/stringbuffer.md)
 
 ## AWS
 * [Amazon S3 개괄](https://github.com/MrKeeplearning/TIL/blob/main/AWS/amazon-s3.md)
