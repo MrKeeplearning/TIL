@@ -40,6 +40,17 @@ System.out.println(result);  // "meta, amazon 절 뽑아주세요" 출력
 - `new StringBuffer()`로 StringBuffer 객체를 생성하는 것은 String 자료형을 사용하는 것보다 메모리 사용도 많고 속도도 느림
 - 문자열 추가나 변경이 많은 것이 아닌 이상 String을 쓰는 것이 유리. 물론 그 반대의 경우에는 StringBuffer 사용 권장.
 
+### 💡 현대의 자바 컴파일러가 `+` 연산을 대하는 방식
+
+- 현재의 자바 컴파일러는 `+` 연산을 StringBuilder의 append로 바꾼다.
+- `str = str1 + str2 + str3`와 같은 코드가 있다면 컴파일러는 아래와 같은 코드로 만든다.
+- [스택오버플로우의 답변](https://stackoverflow.com/questions/7817951/string-concatenation-in-java-when-to-use-stringbuilder-and-concat)에서 많은 것을 얻을 수 있었다.
+
+```java
+StringBuilder sb = new StringBuilder();
+str = sb.append(str1).append(str2).append(str3).toString();
+```
+
 ## 2. insert
 
 - 특정 인덱스에 원하는 문자열을 삽입 가능
@@ -70,4 +81,5 @@ System.out.println(sb.substring(0, 4));     // "Hell" 출력
 
 # Reference
 
-[점프 투 자바: StringBuffer](https://wikidocs.net/276)
+- [점프 투 자바: StringBuffer](https://wikidocs.net/276)
+- [stack overflow: String concatenation in Java - when to use +, StringBuilder and concat](https://stackoverflow.com/questions/7817951/string-concatenation-in-java-when-to-use-stringbuilder-and-concat)
