@@ -73,7 +73,27 @@ sb.append("Hello World");
 System.out.println(sb.substring(0, 4));     // "Hell" 출력
 ```
 
-## 4. StringBuilder
+## 4. replace()
+
+- StringBuffer의 replace() 메서드를 활용하면 StringBuffer 객체에서 특정 인덱스 범위 내의 문자열을 원하는 문자열로 바꾸는 것이 가능하다.
+- 3개의 파라미터를 받는다.
+  - `replace(int 시작 인덱스, int 끝 인덱스, String 교체할 문자열)`
+  - 끝 인덱스 직전까지가 해당되는 범위이다. 끝 인덱스는 범위에 포함되지 않는다.
+
+```java
+public class Replace {
+    public static void main(String[] args) {
+        StringBuffer sb = new StringBuffer("Hello World");
+        int startIndex = 6;
+        int endIndex = 10;
+        String str = "Davi";
+        String result = sb.replace(startIndex, endIndex, str).toString();
+        System.out.println(result);     // 출력: Hello David
+    }
+}
+```
+
+## 5. StringBuilder
 
 - StringBuffer가 멀티스레드 환경에서 안전하다는 장점이 있다면 StringBuilder는 StringBuffer보다 성능이 좋음
 - 동기화를 고려하지 않아도 된다면 StringBuilder를 사용하는 것이 유리
