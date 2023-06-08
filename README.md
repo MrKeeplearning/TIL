@@ -9,6 +9,8 @@
 
 * [N번 반복된 문자로 이루어진 문자열을 생성하는 방법](https://github.com/MrKeeplearning/TIL/blob/main/Java/%EC%9E%90%EB%B0%94%EC%9D%98%20%EB%AC%B8%EC%9E%90%EC%97%B4%20%EB%B0%98%EB%B3%B5/%EC%9E%90%EB%B0%94%EC%9D%98%20%EB%AC%B8%EC%9E%90%EC%97%B4%20%EB%B0%98%EB%B3%B5.md)
 * [StringBuffer와 String, 그리고 StringBuilder](https://github.com/MrKeeplearning/TIL/blob/main/Java/StringBuffer/stringbuffer.md)
+* [equals() 메서드와 == 연산자의 차이](https://github.com/MrKeeplearning/TIL/blob/main/Java/equals%20%EB%A9%94%EC%84%9C%EB%93%9C%EC%99%80%20%3D%3D%20%EC%97%B0%EC%82%B0%EC%9E%90%EC%9D%98%20%EC%B0%A8%EC%9D%B4/Difference%20between%20%3D%3D%20and%20equals.md)
+* [자바의 객체가 메모리에 저장되는 방법](https://github.com/MrKeeplearning/TIL/blob/main/Java/%EC%9E%90%EB%B0%94%20%EA%B0%9D%EC%B2%B4%EA%B0%80%20%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%97%90%20%EC%A0%80%EC%9E%A5%EB%90%98%EB%8A%94%20%EB%B0%A9%EB%B2%95/%EC%9E%90%EB%B0%94%20%EA%B0%9D%EC%B2%B4%EA%B0%80%20%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%97%90%20%EC%A0%80%EC%9E%A5%EB%90%98%EB%8A%94%20%EB%B0%A9%EB%B2%95.md)
 
 ## AWS
 * [Amazon S3 개괄](https://github.com/MrKeeplearning/TIL/blob/main/AWS/amazon-s3.md)
