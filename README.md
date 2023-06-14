@@ -11,6 +11,8 @@
 * [StringBuffer와 String, 그리고 StringBuilder](https://github.com/MrKeeplearning/TIL/blob/main/Java/StringBuffer/stringbuffer.md)
 * [equals() 메서드와 == 연산자의 차이](https://github.com/MrKeeplearning/TIL/blob/main/Java/equals%20%EB%A9%94%EC%84%9C%EB%93%9C%EC%99%80%20%3D%3D%20%EC%97%B0%EC%82%B0%EC%9E%90%EC%9D%98%20%EC%B0%A8%EC%9D%B4/Difference%20between%20%3D%3D%20and%20equals.md)
 * [자바의 객체가 메모리에 저장되는 방법](https://github.com/MrKeeplearning/TIL/blob/main/Java/%EC%9E%90%EB%B0%94%20%EA%B0%9D%EC%B2%B4%EA%B0%80%20%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%97%90%20%EC%A0%80%EC%9E%A5%EB%90%98%EB%8A%94%20%EB%B0%A9%EB%B2%95/%EC%9E%90%EB%B0%94%20%EA%B0%9D%EC%B2%B4%EA%B0%80%20%EB%A9%94%EB%AA%A8%EB%A6%AC%EC%97%90%20%EC%A0%80%EC%9E%A5%EB%90%98%EB%8A%94%20%EB%B0%A9%EB%B2%95.md)
+* [자바에서 문자를 비교하는 방법](https://github.com/MrKeeplearning/TIL/blob/main/Java/%EB%AC%B8%EC%9E%90%20%EB%B9%84%EA%B5%90/%EC%9E%90%EB%B0%94%EC%97%90%EC%84%9C%20%EB%AC%B8%EC%9E%90%20%EB%B9%84%EA%B5%90.md)
+  * 관계연산자 사용하기, `Character.compare()`, `Character.compareTo()`, `Objects.equals()`
 
 ## AWS
 * [Amazon S3 개괄](https://github.com/MrKeeplearning/TIL/blob/main/AWS/amazon-s3.md)
