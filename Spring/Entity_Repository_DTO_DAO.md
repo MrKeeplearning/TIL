@@ -1,7 +1,7 @@
 # Entity, Repository, DTO, DAO
 
 <p align="center">
-    <img src="Spring/img/Entity_Repository_DTO_DAO.png" width="600">
+    <img src="/Spring/img/Entity_Repository_DTO_DAO.png" width="600">
 </p>
 
 ### ✅ Client
